@@ -6,13 +6,13 @@ def export_model():
     model_name = 'crazyflie'
     # parameters
     g0  = 9.8066     # [m.s^2] accerelation of gravity
-    mass  = 33e-3      # [kg] total mass (with one marker)
-    Ixx = 1.395e-5   # [kg.m^2] Inertia moment around x-axis
-    Iyy = 1.395e-5   # [kg.m^2] Inertia moment around y-axis
-    Izz = 2.173e-5   # [kg.m^2] Inertia moment around z-axis
-    Cd  = 7.9379e-06 # [N/krpm^2] Drag coef
-    Ct  = 3.25e-4    # [N/krpm^2] Thrust coef
-    dq  = 65e-3      # [m] distance between motors' center
+    mass  = 2.0       # [kg] total mass (with one marker)
+    Ixx = 0.02166666666666667   # [kg.m^2] Inertia moment around x-axis
+    Iyy = 0.02166666666666667   # [kg.m^2] Inertia moment around y-axis
+    Izz = 0.04000000000000001   # [kg.m^2] Inertia moment around z-axis
+    Cd  = 1.4999e-03 # [N/krpm^2] Drag coef
+    Ct  = 0.093746    # [N/krpm^2] Thrust coef
+    dq  = 0.246073*2      # [m] distance between motors' center
     l   = dq/2       # [m] distance between motors' center and the axis of rotation
 
     # 世界坐标系位置

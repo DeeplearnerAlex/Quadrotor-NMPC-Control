@@ -9,13 +9,13 @@ from nmpc_controller import NMPC_Controller
 controller = NMPC_Controller()
 
 gravity = 9.8066        # 重力加速度 单位m/s^2
-mass = 0.033            # 飞行器质量 单位kg
-Ct = 3.25e-4            # 电机推力系数 (N/krpm^2)
-Cd = 7.9379e-6          # 电机反扭系数 (Nm/krpm^2)
+mass = 2.0                # 飞行器质量 单位kg
+Ct = 0.093746           # 电机推力系数 (N/krpm^2)
+Cd = 1.4999e-03          # 电机反扭系数 (Nm/krpm^2)
 
-arm_length = 0.065/2.0  # 电机力臂长度 单位m
-max_thrust = 0.1573     # 单个电机最大推力 单位N (电机最大转速22krpm)
-max_torque = 3.842e-03  # 单个电机最大扭矩 单位Nm (电机最大转速22krpm)
+arm_length = 0.246073  # 电机力臂长度 单位m
+max_thrust = 8.54858     # 单个电机最大推力 单位N (电机最大转9.5493krpm)
+max_torque = 0.13677728  # 单个电机最大扭矩 单位Nm (电机最大转速9.5493krpm)
 
 # 仿真周期 100Hz 10ms 0.01s
 dt = 0.01
@@ -27,8 +27,8 @@ def calc_motor_force(krpm):
 
 # 根据电机转速计算电机归一化输入
 def calc_motor_input(krpm):
-    if krpm > 22:
-        krpm = 22
+    if krpm > 9.5493:
+        krpm = 9.5493
     elif krpm < 0:
         krpm = 0
     _force = calc_motor_force(krpm)
@@ -76,19 +76,43 @@ def control_callback(m, d):
     # 构建当前状态
     current_state = np.array([_pos[0], _pos[1], _pos[2], quat[3], quat[0], quat[1], quat[2], _vel[0], _vel[1], _vel[2], omega[0], omega[1], omega[2]])
     # 位置控制模式 目标位点
-    goal_position = np.array([0.0, 0.0, 0.5])
-
+    # 【核心修改】动态计算圆周轨迹目标
+    t = d.time           # 获取仿真当前时间
+    radius = 1.0         # 圆的半径 (米)
+    omega_traj = 0.5     # 运行角速度 (rad/s)，约 12.5 秒转一圈
+    center_z = 1.0       # 飞行高度
+    
+    # 计算圆周上的点
+    target_x = radius * np.cos(omega_traj * t)
+    target_y = radius * np.sin(omega_traj * t)
+    target_z = center_z
+    
+    goal_position = np.array([target_x, target_y, target_z])
     # NMPC Update
     _dt, _control = controller.nmpc_position_control(current_state, goal_position)
-    d.actuator('motor1').ctrl[0] = calc_motor_input(_control[0])
-    d.actuator('motor2').ctrl[0] = calc_motor_input(_control[1])
-    d.actuator('motor3').ctrl[0] = calc_motor_input(_control[2])
-    d.actuator('motor4').ctrl[0] = calc_motor_input(_control[3])
+    # 1. 计算并赋值（建议先存入变量，方便打印和复用）
+    u1 = calc_motor_input(_control[0])
+    u2 = calc_motor_input(_control[1])
+    u3 = calc_motor_input(_control[2])
+    u4 = calc_motor_input(_control[3])
+
+    d.actuator('motor1').ctrl[0] = u1
+    d.actuator('motor2').ctrl[0] = u2
+    d.actuator('motor3').ctrl[0] = u3
+    d.actuator('motor4').ctrl[0] = u4
 
     log_count += 1
     if log_count >= 50:
         log_count = 0
         # 这里输出log
+        # 将 _dt 转换为毫秒(ms)打印，更加直观
+        # 打印求解时间、仿真时间以及四个电机的归一化输出 (0~1)
+        curr_pos = d.qpos[0:3]
+
+        print("-" * 50)
+        print(f"NMPC 求解时间: {_dt*1000:.3f} ms | 仿真时间: {d.time:.2f} s")
+        print(f"当前位置 (XYZ): [X: {curr_pos[0]:.3f}, Y: {curr_pos[1]:.3f}, Z: {curr_pos[2]:.3f}] m")
+        print(f"电机输出 (u): [M1: {u1:.4f}, M2: {u2:.4f}, M3: {u3:.4f}, M4: {u4:.4f}]")
 
 if __name__ == '__main__':
     viewer.launch(loader=load_callback)

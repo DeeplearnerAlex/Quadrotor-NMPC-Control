@@ -16,7 +16,7 @@ class NMPC_Controller:
         self.ocp = AcadosOcp()       # OCP 优化问题
         self.model = export_model()  # 导出四旋翼物理模型
 
-        self.Tf = 0.75                      # 预测时间长度(s)
+        self.Tf = 0.75                     # 预测时间长度(s)
         self.N = 50                         # 预测步数(节点数量)
         self.nx = self.model.x.size()[0]    # 状态维度 13维度
         self.nu = self.model.u.size()[0]    # 控制输入维度 4维度
@@ -29,15 +29,15 @@ class NMPC_Controller:
 
         # parameters
         self.g0  = 9.8066    # [m.s^2] accerelation of gravity
-        self.mq  = 33e-3     # [kg] total mass (with one marker)
-        self.Ct  = 3.25e-4   # [N/krpm^2] Thrust coef
+        self.mq  = 2.0     # [kg] total mass (with one marker)
+        self.Ct  = 0.093746   # [N/krpm^2] Thrust coef
 
         # bounds
         self.hov_w = np.sqrt((self.mq*self.g0)/(4*self.Ct))  # 悬停时单个电机推力
         print(f"hovor speed: {self.hov_w} krpm")
-        # hovor speed: 15.777730167256925 krpm
+        # hovor speed: 7.232 krpm
 
-        self.max_speed = 22.0  # 电机最高转速(krpm)
+        self.max_speed = 9.5493  # 电机最高转速(krpm)
 
         # set weighting matrices 状态权重矩阵
         Q = np.eye(self.nx)
@@ -180,7 +180,7 @@ if __name__ == '__main__':
     goal_state = np.array([0.0, 0.0, 0.1, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
     _dt, w = nmpc_controller.nmpc_state_control(current_state, goal_state)
 
-    # print("Control Input:")
-    # print(w)
+    print("Control Input:")
+    print(w)
     # print("State Estimation:")
     # print(x)
