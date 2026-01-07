@@ -36,13 +36,13 @@
 #include "acados_c/ocp_nlp_interface.h"
 #include "acados_c/external_function_interface.h"
 
-#define CRAZYFLIE_NX     13
+#define CRAZYFLIE_NX     10
 #define CRAZYFLIE_NZ     0
 #define CRAZYFLIE_NU     4
 #define CRAZYFLIE_NP     0
 #define CRAZYFLIE_NP_GLOBAL     0
 #define CRAZYFLIE_NBX    0
-#define CRAZYFLIE_NBX0   13
+#define CRAZYFLIE_NBX0   10
 #define CRAZYFLIE_NBU    4
 #define CRAZYFLIE_NSBX   0
 #define CRAZYFLIE_NSBU   0
@@ -61,9 +61,9 @@
 #define CRAZYFLIE_NG     0
 #define CRAZYFLIE_NBXN   0
 #define CRAZYFLIE_NGN    0
-#define CRAZYFLIE_NY0    17
-#define CRAZYFLIE_NY     17
-#define CRAZYFLIE_NYN    13
+#define CRAZYFLIE_NY0    14
+#define CRAZYFLIE_NY     14
+#define CRAZYFLIE_NYN    10
 #define CRAZYFLIE_N      50
 #define CRAZYFLIE_NH     0
 #define CRAZYFLIE_NHN    0

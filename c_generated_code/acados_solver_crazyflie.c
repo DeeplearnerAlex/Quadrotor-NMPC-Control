@@ -242,7 +242,7 @@ static ocp_nlp_dims* crazyflie_acados_create_setup_dimensions(crazyflie_solver_c
     nsbx[0] = 0;
     ns[0] = NS0;
     
-    nbxe[0] = 13;
+    nbxe[0] = 10;
     
     ny[0] = NY0;
     nh[0] = NH0;
@@ -494,10 +494,7 @@ void crazyflie_acados_setup_nlp_in(crazyflie_solver_capsule* capsule, const int 
     double* yref_0 = calloc(NY0, sizeof(double));
     // change only the non-zero elements:
     yref_0[3] = 1;
-    yref_0[13] = 7.232157237518725;
-    yref_0[14] = 7.232157237518725;
-    yref_0[15] = 7.232157237518725;
-    yref_0[16] = 7.232157237518725;
+    yref_0[10] = 20.2408224;
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, 0, "yref", yref_0);
     free(yref_0);
 
@@ -509,13 +506,10 @@ void crazyflie_acados_setup_nlp_in(crazyflie_solver_capsule* capsule, const int 
     W_0[7+(NY0) * 7] = 1;
     W_0[8+(NY0) * 8] = 1;
     W_0[9+(NY0) * 9] = 4;
-    W_0[10+(NY0) * 10] = 0.00001;
-    W_0[11+(NY0) * 11] = 0.00001;
-    W_0[12+(NY0) * 12] = 10;
-    W_0[13+(NY0) * 13] = 0.06;
-    W_0[14+(NY0) * 14] = 0.06;
-    W_0[15+(NY0) * 15] = 0.06;
-    W_0[16+(NY0) * 16] = 0.06;
+    W_0[10+(NY0) * 10] = 0.01;
+    W_0[11+(NY0) * 11] = 0.1;
+    W_0[12+(NY0) * 12] = 0.1;
+    W_0[13+(NY0) * 13] = 0.1;
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, 0, "W", W_0);
     free(W_0);
     double* Vx_0 = calloc(NY0*NX, sizeof(double));
@@ -530,26 +524,20 @@ void crazyflie_acados_setup_nlp_in(crazyflie_solver_capsule* capsule, const int 
     Vx_0[7+(NY0) * 7] = 1;
     Vx_0[8+(NY0) * 8] = 1;
     Vx_0[9+(NY0) * 9] = 1;
-    Vx_0[10+(NY0) * 10] = 1;
-    Vx_0[11+(NY0) * 11] = 1;
-    Vx_0[12+(NY0) * 12] = 1;
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, 0, "Vx", Vx_0);
     free(Vx_0);
     double* Vu_0 = calloc(NY0*NU, sizeof(double));
     // change only the non-zero elements:
-    Vu_0[13+(NY0) * 0] = 1;
-    Vu_0[14+(NY0) * 1] = 1;
-    Vu_0[15+(NY0) * 2] = 1;
-    Vu_0[16+(NY0) * 3] = 1;
+    Vu_0[10+(NY0) * 0] = 1;
+    Vu_0[11+(NY0) * 1] = 1;
+    Vu_0[12+(NY0) * 2] = 1;
+    Vu_0[13+(NY0) * 3] = 1;
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, 0, "Vu", Vu_0);
     free(Vu_0);
     double* yref = calloc(NY, sizeof(double));
     // change only the non-zero elements:
     yref[3] = 1;
-    yref[13] = 7.232157237518725;
-    yref[14] = 7.232157237518725;
-    yref[15] = 7.232157237518725;
-    yref[16] = 7.232157237518725;
+    yref[10] = 20.2408224;
 
     for (int i = 1; i < N; i++)
     {
@@ -564,13 +552,10 @@ void crazyflie_acados_setup_nlp_in(crazyflie_solver_capsule* capsule, const int 
     W[7+(NY) * 7] = 1;
     W[8+(NY) * 8] = 1;
     W[9+(NY) * 9] = 4;
-    W[10+(NY) * 10] = 0.00001;
-    W[11+(NY) * 11] = 0.00001;
-    W[12+(NY) * 12] = 10;
-    W[13+(NY) * 13] = 0.06;
-    W[14+(NY) * 14] = 0.06;
-    W[15+(NY) * 15] = 0.06;
-    W[16+(NY) * 16] = 0.06;
+    W[10+(NY) * 10] = 0.01;
+    W[11+(NY) * 11] = 0.1;
+    W[12+(NY) * 12] = 0.1;
+    W[13+(NY) * 13] = 0.1;
 
     for (int i = 1; i < N; i++)
     {
@@ -589,9 +574,6 @@ void crazyflie_acados_setup_nlp_in(crazyflie_solver_capsule* capsule, const int 
     Vx[7+(NY) * 7] = 1;
     Vx[8+(NY) * 8] = 1;
     Vx[9+(NY) * 9] = 1;
-    Vx[10+(NY) * 10] = 1;
-    Vx[11+(NY) * 11] = 1;
-    Vx[12+(NY) * 12] = 1;
     for (int i = 1; i < N; i++)
     {
         ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, i, "Vx", Vx);
@@ -601,10 +583,10 @@ void crazyflie_acados_setup_nlp_in(crazyflie_solver_capsule* capsule, const int 
     
     double* Vu = calloc(NY*NU, sizeof(double));
     // change only the non-zero elements:
-    Vu[13+(NY) * 0] = 1;
-    Vu[14+(NY) * 1] = 1;
-    Vu[15+(NY) * 2] = 1;
-    Vu[16+(NY) * 3] = 1;
+    Vu[10+(NY) * 0] = 1;
+    Vu[11+(NY) * 1] = 1;
+    Vu[12+(NY) * 2] = 1;
+    Vu[13+(NY) * 3] = 1;
 
     for (int i = 1; i < N; i++)
     {
@@ -625,9 +607,6 @@ void crazyflie_acados_setup_nlp_in(crazyflie_solver_capsule* capsule, const int 
     W_e[7+(NYN) * 7] = 50;
     W_e[8+(NYN) * 8] = 50;
     W_e[9+(NYN) * 9] = 200;
-    W_e[10+(NYN) * 10] = 0.0005;
-    W_e[11+(NYN) * 11] = 0.0005;
-    W_e[12+(NYN) * 12] = 500;
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, N, "W", W_e);
     free(W_e);
     double* Vx_e = calloc(NYN*NX, sizeof(double));
@@ -642,9 +621,6 @@ void crazyflie_acados_setup_nlp_in(crazyflie_solver_capsule* capsule, const int 
     Vx_e[7+(NYN) * 7] = 1;
     Vx_e[8+(NYN) * 8] = 1;
     Vx_e[9+(NYN) * 9] = 1;
-    Vx_e[10+(NYN) * 10] = 1;
-    Vx_e[11+(NYN) * 11] = 1;
-    Vx_e[12+(NYN) * 12] = 1;
     ocp_nlp_cost_model_set(nlp_config, nlp_dims, nlp_in, N, "Vx", Vx_e);
     free(Vx_e);
 
@@ -669,9 +645,6 @@ void crazyflie_acados_setup_nlp_in(crazyflie_solver_capsule* capsule, const int 
     idxbx0[7] = 7;
     idxbx0[8] = 8;
     idxbx0[9] = 9;
-    idxbx0[10] = 10;
-    idxbx0[11] = 11;
-    idxbx0[12] = 12;
 
     double* lubx0 = calloc(2*NBX0, sizeof(double));
     double* lbx0 = lubx0;
@@ -686,7 +659,7 @@ void crazyflie_acados_setup_nlp_in(crazyflie_solver_capsule* capsule, const int 
     free(idxbx0);
     free(lubx0);
     // idxbxe_0
-    int* idxbxe_0 = malloc(13 * sizeof(int));
+    int* idxbxe_0 = malloc(10 * sizeof(int));
     idxbxe_0[0] = 0;
     idxbxe_0[1] = 1;
     idxbxe_0[2] = 2;
@@ -697,9 +670,6 @@ void crazyflie_acados_setup_nlp_in(crazyflie_solver_capsule* capsule, const int 
     idxbxe_0[7] = 7;
     idxbxe_0[8] = 8;
     idxbxe_0[9] = 9;
-    idxbxe_0[10] = 10;
-    idxbxe_0[11] = 11;
-    idxbxe_0[12] = 12;
     ocp_nlp_constraints_model_set(nlp_config, nlp_dims, nlp_in, nlp_out, 0, "idxbxe", idxbxe_0);
     free(idxbxe_0);
 
@@ -724,10 +694,13 @@ void crazyflie_acados_setup_nlp_in(crazyflie_solver_capsule* capsule, const int 
     double* lubu = calloc(2*NBU, sizeof(double));
     double* lbu = lubu;
     double* ubu = lubu + NBU;
-    ubu[0] = 9.5493;
-    ubu[1] = 9.5493;
-    ubu[2] = 9.5493;
-    ubu[3] = 9.5493;
+    ubu[0] = 34.19432;
+    lbu[1] = -0.8;
+    ubu[1] = 0.8;
+    lbu[2] = -0.8;
+    ubu[2] = 0.8;
+    lbu[3] = -0.8;
+    ubu[3] = 0.8;
 
     for (int i = 0; i < N; i++)
     {

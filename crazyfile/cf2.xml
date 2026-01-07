@@ -69,7 +69,7 @@
     <body name="cf2" pos="0 0 0.1" childclass="cf2">
       <freejoint/>
       <!-- 修改无人机质量 -->
-      <inertial pos="0 0 0" mass="2.0" diaginertia="0.02166666666666667 0.02166666666666667 0.04000000000000001"/>
+      <inertial pos="0 0 0" mass="2.064" diaginertia="0.02166666666666667 0.02166666666666667 0.04000000000000001"/>
       <camera name="track" pos="-1 0 .5" xyaxes="0 -1 0 1 0 2" mode="trackcom"/>
       <geom mesh="cf2_0" material="propeller_plastic" class="visual"/>
       <geom mesh="cf2_1" material="medium_gloss_plastic" class="visual"/>

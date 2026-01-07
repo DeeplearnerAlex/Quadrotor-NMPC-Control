@@ -34,7 +34,7 @@
 #include "acados_c/sim_interface.h"
 #include "acados_c/external_function_interface.h"
 
-#define CRAZYFLIE_NX     13
+#define CRAZYFLIE_NX     10
 #define CRAZYFLIE_NZ     0
 #define CRAZYFLIE_NU     4
 #define CRAZYFLIE_NP     0

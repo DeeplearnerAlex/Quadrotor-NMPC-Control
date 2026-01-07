@@ -2,18 +2,12 @@
 from acados_template import AcadosModel
 from casadi import SX, vertcat
 
+# 将 NMPC 的控制量从四个电机转速切换为三轴角速度 + 总推力
 def export_model():
     model_name = 'crazyflie'
     # parameters
     g0  = 9.8066     # [m.s^2] accerelation of gravity
-    mass  = 2.0       # [kg] total mass (with one marker)
-    Ixx = 0.02166666666666667   # [kg.m^2] Inertia moment around x-axis
-    Iyy = 0.02166666666666667   # [kg.m^2] Inertia moment around y-axis
-    Izz = 0.04000000000000001   # [kg.m^2] Inertia moment around z-axis
-    Cd  = 1.4999e-03 # [Nm/krpm^2] Drag coef
-    Ct  = 0.093746    # [N/krpm^2] Thrust coef
-    dq  = 0.246073*2      # [m] distance between motors' center
-    l   = dq/2       # [m] distance between motors' center and the axis of rotation
+    mass  = 2.064      # [kg] total mass (with one marker)
 
     # 世界坐标系位置
     px = SX.sym('px')
@@ -28,19 +22,16 @@ def export_model():
     vx = SX.sym('vx')
     vy = SX.sym('vy')
     vz = SX.sym('vz')
-    # 机体坐标系角速度
-    wx = SX.sym('wx')
+    # 构建状态向量
+    # --- 1. 定义状态量 (缩减为 10 维) ---
+    x = vertcat(px, py, pz, q0, q1, q2, q3, vx, vy, vz)
+
+    # --- 2. 定义控制量 (总推力 + 三轴角速度) ---
+    thrust = SX.sym('thrust') # 总推力 (牛顿 N)
+    wx = SX.sym('wx')         # 机体系角速度
     wy = SX.sym('wy')
     wz = SX.sym('wz')
-    # 构建状态向量
-    x = vertcat(px, py, pz, q0, q1, q2, q3, vx, vy, vz, wx, wy, wz)
-
-    # 系统控制输入: 四个电机的转速
-    w1 = SX.sym('w1')
-    w2 = SX.sym('w2')
-    w3 = SX.sym('w3')
-    w4 = SX.sym('w4')
-    u = vertcat(w1, w2, w3, w4)
+    u = vertcat(thrust, wx, wy, wz)
 
     # for f_impl
     px_dot = SX.sym('px_dot')
@@ -53,19 +44,16 @@ def export_model():
     vx_dot = SX.sym('vx_dot')
     vy_dot = SX.sym('vy_dot')
     vz_dot = SX.sym('vz_dot')
-    wx_dot = SX.sym('wx_dot')
-    wy_dot = SX.sym('wy_dot')
-    wz_dot = SX.sym('wz_dot')
-    # 构建导数状态向量
-    xdot = vertcat(px_dot, py_dot, pz_dot, q0_dot, q1_dot, q2_dot, q3_dot, vx_dot, vy_dot, vz_dot, wx_dot, wy_dot, wz_dot)
 
+    # 构建导数状态向量
+    xdot = vertcat(px_dot, py_dot, pz_dot, q0_dot, q1_dot, q2_dot, q3_dot, vx_dot, vy_dot, vz_dot)
     # 位置求导
     px_d = vx
     py_d = vy
     pz_d = vz
 
-    # 速度求导
-    _thrust_acc_b = Ct*(w1**2 + w2**2 + w3**2 + w4**2) / mass  # 机体坐标系中推力引起的加速度
+    # 速度求导 (总推力除以质量得到加速度)
+    _thrust_acc_b = thrust / mass  # 机体坐标系中推力引起的加速度
     # 将机体坐标系推力加速度转换为世界坐标系推力加速度
     # Rwb * [0, 0, _thrust_acc_b]
     _thrust_accx_w = 2*(q1*q3+q0*q2)*_thrust_acc_b
@@ -80,20 +68,10 @@ def export_model():
     q1_d =  (q0*wx)/2 - (q3*wy)/2 + (q2*wz)/2
     q2_d =  (q3*wx)/2 + (q0*wy)/2 - (q1*wz)/2
     q3_d =  (q1*wy)/2 - (q2*wx)/2 + (q0*wz)/2
-    
-    # 机体角速度求导
-    # 计算三轴扭矩输入
-    mx = Ct*l*(  w1**2 - w2**2 - w3**2 + w4**2)
-    my = Ct*l*( -w1**2 - w2**2 + w3**2 + w4**2)
-    mz = Cd*  ( -w1**2 + w2**2 - w3**2 + w4**2)
-    # 计算角速度导数
-    wx_d = (mx + Iyy*wy*wz - Izz*wy*wz)/Ixx
-    wy_d = (my - Ixx*wx*wz + Izz*wx*wz)/Iyy
-    wz_d = (mz + Ixx*wx*wy - Iyy*wx*wy)/Izz
 
     # Explicit and Implicit functions
     # 构建显式表达式和隐式表达式
-    f_expl = vertcat(px_d, py_d, pz_d, q0_d, q1_d, q2_d, q3_d, vx_d, vy_d, vz_d, wx_d, wy_d, wz_d)
+    f_expl = vertcat(px_d, py_d, pz_d, q0_d, q1_d, q2_d, q3_d, vx_d, vy_d, vz_d)
     f_impl = xdot - f_expl
 
     # algebraic variables

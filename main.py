@@ -9,7 +9,7 @@ from nmpc_controller import NMPC_Controller
 controller = NMPC_Controller()
 
 gravity = 9.8066        # 重力加速度 单位m/s^2
-mass = 2.0                # 飞行器质量 单位kg
+mass = 2.064                # 飞行器质量 单位kg
 Ct = 0.093746           # 电机推力系数 (N/krpm^2)
 Cd = 1.4999e-03          # 电机反扭系数 (Nm/krpm^2)
 
@@ -74,7 +74,7 @@ def control_callback(m, d):
     quat = np.array([quat_x, quat_y, quat_z, quat_w])  # x y z w
     omega = np.array([gyro_x, gyro_y, gyro_z])         # 角速度
     # 构建当前状态
-    current_state = np.array([_pos[0], _pos[1], _pos[2], quat[3], quat[0], quat[1], quat[2], _vel[0], _vel[1], _vel[2], omega[0], omega[1], omega[2]])
+    current_state = np.array([_pos[0], _pos[1], _pos[2], quat[3], quat[0], quat[1], quat[2], _vel[0], _vel[1], _vel[2]])
     # 位置控制模式 目标位点
     # 【核心修改】动态计算圆周轨迹目标
     t = d.time           # 获取仿真当前时间
@@ -88,6 +88,7 @@ def control_callback(m, d):
     target_z = center_z
     
     goal_position = np.array([target_x, target_y, target_z])
+    goal_position = np.array([0, 0, 2.0])  # --- IGNORE ---
     # NMPC Update
     _dt, _control = controller.nmpc_position_control(current_state, goal_position)
     # 1. 计算并赋值（建议先存入变量，方便打印和复用）
@@ -113,6 +114,9 @@ def control_callback(m, d):
         print(f"NMPC 求解时间: {_dt*1000:.3f} ms | 仿真时间: {d.time:.2f} s")
         print(f"当前位置 (XYZ): [X: {curr_pos[0]:.3f}, Y: {curr_pos[1]:.3f}, Z: {curr_pos[2]:.3f}] m")
         print(f"电机输出 (u): [M1: {u1:.4f}, M2: {u2:.4f}, M3: {u3:.4f}, M4: {u4:.4f}]")
+        # --- 新增：打印原始计算转速 (krpm) ---
+        # _control[0:4] 分别对应四个电机的计算转速
+        print(f"电机转速(krpm): [M1: {_control[0]:.4f}, M2: {_control[1]:.4f}, M3: {_control[2]:.4f}, M4: {_control[3]:.4f}]")
 
 if __name__ == '__main__':
     viewer.launch(loader=load_callback)
